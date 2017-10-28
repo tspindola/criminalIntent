@@ -19,6 +19,9 @@ import java.util.List;
  */
 
 public class CrimeListFragment extends Fragment {
+    static final int TYPE_REQ_POLICE = 1;
+    static final int TYPE_NO_POLICE = 2;
+
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mCrimeAdapter;
 
@@ -33,8 +36,8 @@ public class CrimeListFragment extends Fragment {
             mDateTextView.setText(mCrime.getDate().toString());
         }
 
-        public CrimeHolder(LayoutInflater inflater,ViewGroup parent){
-            super(inflater.inflate(R.layout.list_item_crime,parent,false));
+        public CrimeHolder(LayoutInflater inflater,ViewGroup parent,int layout){
+            super(inflater.inflate(layout,parent,false));
             itemView.setOnClickListener(this);
             mTitleTextView = (TextView) itemView.findViewById(R.id.item_crime_title);
             mDateTextView = (TextView) itemView.findViewById(R.id.item_crime_date);
@@ -54,8 +57,15 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public CrimeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            CrimeHolder ret;
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            return new CrimeHolder(layoutInflater,parent);
+            if(TYPE_NO_POLICE == viewType) {
+                ret = new CrimeHolder(layoutInflater, parent, R.layout.list_item_crime);
+            }
+            else{
+                ret = new CrimeHolder(layoutInflater, parent, R.layout.list_item_police_crime);
+            }
+            return ret;
         }
 
         @Override
@@ -67,6 +77,21 @@ public class CrimeListFragment extends Fragment {
         @Override
         public int getItemCount() {
             return mCrimes.size();
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            int ret;
+            Crime crime = mCrimes.get(position);
+            if(crime.isRequiresPolice())
+            {
+                ret = TYPE_REQ_POLICE;
+            }
+            else
+            {
+                ret = TYPE_NO_POLICE;
+            }
+         return ret;
         }
     }
 
